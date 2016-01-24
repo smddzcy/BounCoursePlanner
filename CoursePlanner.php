@@ -51,7 +51,15 @@ class CoursePlanner
                 throw new Exception("This option requires course fetcher to work.");
             require_once "CourseFetcher.php";
             $courseFetcher = new CourseFetcher((int)$this->year, (int)$this->semester);
-            $courseDetails = $courseFetcher->getDetails($name);
+            if (strpos($name, ".") !== false) { // contains explicit section detail
+                list($name, $section) = explode(".", $name);
+                $courseDetails = $courseFetcher->getDetails($name);
+                if (!array_key_exists($section, $courseDetails))
+                    throw new Exception($name . "." . $section . " cannot be added; course does not have that section for the semester.");
+                $courseDetails = [$section => $courseDetails[$section]];
+            } else {
+                $courseDetails = $courseFetcher->getDetails($name);
+            }
             if ($courseDetails === false)
                 throw new Exception($name . " cannot be added; if you've spelled it correctly, the course is not available for the semester.");
             $hours = [];

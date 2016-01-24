@@ -12,7 +12,6 @@ $langClass = new Language();
 $langClass->setUserLanguage($userLang);
 ?>
 <!DOCTYPE html>
-<!-- @smddzcy -->
 <html lang="<?php echo $userLang; ?>">
 <head>
     <link rel="stylesheet" media="screen" href="//netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
@@ -108,6 +107,7 @@ $langClass->setUserLanguage($userLang);
                         <li><?php echo $langClass->lang["NOTE_1"]; ?></li>
                         <li><?php echo $langClass->lang["NOTE_2"]; ?></li>
                         <li><?php echo $langClass->lang["NOTE_3"]; ?></li>
+                        <li><?php echo $langClass->lang["NOTE_4"]; ?></li>
                     </ul>
                 </div>
             </div>

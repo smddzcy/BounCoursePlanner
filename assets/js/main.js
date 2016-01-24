@@ -32,6 +32,9 @@ $(document).ready(function () {
 
     // auto-completion for course names
     var availableTags = process("getAvailableCourses", 1);
+    var availableTagsWithSections = availableTags[1];
+    var currWithSections = false;
+    availableTags = availableTags[0];
     cInsert.autocomplete({
         source: function (request, response) {
             var results = $.ui.autocomplete.filter(availableTags, request.term);
@@ -46,6 +49,22 @@ $(document).ready(function () {
     cInsert.keydown(function (event) {
         if (event.keyCode == 13) {
             $("#add-course").click();
+        } else if (event.keyCode == 190 && currWithSections === false) {
+            cInsert.autocomplete({
+                source: function (request, response) {
+                    var results = $.ui.autocomplete.filter(availableTagsWithSections, request.term);
+                    response(results.slice(0, 10));
+                }
+            });
+            currWithSections = true;
+        } else if (cInsert.val().indexOf(".") == -1 && currWithSections === true) {
+            cInsert.autocomplete({
+                source: function (request, response) {
+                    var results = $.ui.autocomplete.filter(availableTags, request.term);
+                    response(results.slice(0, 10));
+                }
+            });
+            currWithSections = false;
         }
     });
 
@@ -80,10 +99,10 @@ $(document).ready(function () {
         if (course.length == 0) {
             alert(COURSE_EMPTY);
             return;
-        } else if (availableTags.indexOf(course) == -1) {
+        } else if (availableTags.indexOf(course) == -1 && availableTagsWithSections.indexOf(course) == -1) {
             alert(COURSE_NOT_VALID);
             return;
-        } else if ($('#course-list:contains("' + course + '")').length !== 0) {
+        } else if ($('#course-list:contains("' + (course.indexOf(".") !== -1 ? course.split(".")[0] : course) + '")').length !== 0) {
             alert(COURSE_ALREADY_ADDED);
             return;
         }

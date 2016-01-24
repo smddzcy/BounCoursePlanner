@@ -8,16 +8,24 @@ if (!array_key_exists("function", $_POST) || !array_key_exists("data", $_POST)) 
 $func = $_POST["function"];
 $data = $_POST["data"];
 $fetcher = new CourseFetcher();
-$validCourses = array_keys($fetcher->getAllDetails());
+$validCourseCodes = [];
+$validCourses = []; // with sections
+foreach ($fetcher->getAllDetails() as $courseCode => $sectionArray) {
+    $sectionArray = array_keys($sectionArray);
+    $validCourseCodes[] = $courseCode;
+    for ($i = 0; $i < count($sectionArray); $i++) {
+        $validCourses[] = $courseCode . "." . $sectionArray[$i];
+    }
+}
 switch ($func) {
     case "getAvailableCourses":
-        echo json_encode($validCourses);
+        echo json_encode([$validCourseCodes, $validCourses]);
         break;
     case "findBestPlan":
         $planner = new CoursePlanner();
 
         if (!array_key_exists("courseList", $data)) break;
-        foreach ($data["courseList"] as $courseName) if (in_array($courseName, $validCourses))
+        foreach ($data["courseList"] as $courseName) if (in_array($courseName, $validCourseCodes) || in_array($courseName, $validCourses))
             $planner->addCourse($courseName);
 
         if (array_key_exists("freeHours", $data) && !empty($data["freeHours"]))
