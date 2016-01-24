@@ -32,6 +32,7 @@
 }
 
 .schedule-rows .time-slot {
+    font-size: 1.85vmin !important;
     color: #fff;
 }
 
