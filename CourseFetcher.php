@@ -90,19 +90,25 @@ class CourseFetcher
             preg_match_all('#<tr[^>]*class\="schtd.?">(.*?)</tr>#si', $this->curlHandler->get($programURL), $sections);
             foreach ($sections[1] as $section) {
                 if (self::PROBLEMSESSIONS === true && preg_match('/P\\.S\\./si', $section)) continue;
-                // [1]: Instr. [2]: Days [3]: Hours [4]: Classes [5]: Codes.Sections
+                // [2]: Instr. [3]: Days [4]: Hours Classes [5]: Codes.Sections
                 preg_match('#.*<td>(.*?)</td>[^<]*<td>(.*?)</td>[^<]*<td>(.*?)</td>[^<]*<td>(.*?)</td>[^<]*<td>[^<]*</td>[^<]*<td>[^<]*</td>[^<]*<td>[^<]*</td>[^<]*<td>(.*?)</td>#si', $section, $details);
                 $this->cleanArray($details);
-                if (preg_match("#TBA#si", $details[2])) continue;
+                if (preg_match("#TBA#si", $details[3])) continue;
                 list($courseCode, $courseSection) = explode(".", $details[5]);
+                if (strpos($details[4], " ") !== false) {
+                    list($hours, $rooms) = explode(" ", $details[4]);
+                    $rooms = trim($rooms, "\xC2\xA0\n");
+                } else
+                    $hours = $details[4]; // no room info
+                $hours = trim($hours, "\xC2\xA0\n");
                 $det =& $this->programDetails[$courseCode][$courseSection];
                 if (empty($det)) $det = [null, null, null, null];
-                $det[0] .= $details[2];
-                $det[1] .= $details[3];
+                $det[0] .= $details[3];
+                $det[1] .= $hours;
                 if ($details[4] != "")
-                    $det[2] .= empty($det[2]) ? $details[4] : "|" . $details[4];
+                    $det[2] .= empty($det[2]) ? $details[4] : " | " . $details[4];
                 if ($details[1] != "")
-                    $det[3] .= empty($det[3]) ? $details[1] : "|" . $details[1];
+                    $det[3] .= empty($det[3]) ? $details[1] : " | " . $details[1];
             }
         }
         file_put_contents(self::FILENAME_DETAILS, serialize($this->programDetails));
@@ -119,5 +125,4 @@ class CourseFetcher
         }
         return $arr;
     }
-
 }
