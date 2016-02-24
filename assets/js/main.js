@@ -68,6 +68,10 @@ $(document).ready(function () {
         }
     });
 
+    cInsert.keyup(function(event) {
+        cInsert.val(cInsert.val().turkishToUpper());
+    });
+
     String.prototype.turkishToUpper = function () {
         var string = this;
         var letters = {"i": "I", "ş": "S", "ğ": "G", "ü": "U", "ö": "O", "ç": "C", "ı": "I"};
