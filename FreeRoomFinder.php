@@ -69,7 +69,6 @@ class FreeRoomFinder
         $this->applyFilters($empty);
         if ($echo != true) return $empty;
         foreach ($empty as $room => $days) {
-            if (empty($days)) continue;
             echo $room . $this->nl;
             foreach ($days as $day => $hours) {
                 echo $day . ":" . implode(" ", $hours) . $this->nl;
@@ -131,7 +130,26 @@ class FreeRoomFinder
             }
 
         }
+        foreach ($empty as $i => &$v) if (empty($empty[$i])) unset($empty[$i]);
         return $empty;
+    }
+
+    /**
+     * Convert all elements of an array or a string to UTF8
+     *
+     * @param array|string $d Array to UTF8ize
+     * @return array|string
+     */
+    private function utf8ize($d)
+    {
+        if (is_array($d)) {
+            foreach ($d as $k => $v) {
+                $d[$k] = $this->utf8ize($v);
+            }
+        } else if (is_string($d)) {
+            return utf8_encode($d);
+        }
+        return $d;
     }
 
     /**
