@@ -19,8 +19,11 @@ class CourselistMaker
             CURLOPT_HTTPHEADER => [
                 "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
                 "Accept-Encoding: gzip, deflate",
-                "Accept-Language: tr-TR,tr;q=0.8,en-US;q=0.5,en;q=0.3"
-            ]
+                "Accept-Language: tr-TR,tr;q=0.8,en-US;q=0.5,en;q=0.3",
+                "Connection: keep-alive",
+                "Accept-Encoding: keep-alive"
+            ],
+            CURLOPT_FOLLOWLOCATION => true
         ]);
     }
 
@@ -37,7 +40,13 @@ class CourselistMaker
             echo "- Couldn't reach the login page, trying again." . PHP_EOL;
             $this->sleep();
         }
-        if (preg_match("#(Invalid login)|(Wrong User)#si", $loginResponse)) {
+        if(preg_match("#30 seconds#si", $loginResponse)){
+            echo "- Waiting 30 seconds to login". PHP_EOL;
+            sleep(30);
+            $this->login($userid, $pass);
+            return;
+        }
+        else if (preg_match("#(Invalid login)|(Wrong User)#si", $loginResponse)) {
             echo "- Invalid user ID & password combination." . PHP_EOL;
             return;
         }
@@ -65,6 +74,7 @@ class CourselistMaker
      * @param mixed $courseCode Course code (e.g. 101,150)
      * @param mixed $section Course secttion (e.g. 01,02)
      * @param array|bool $nc Non-credit(true) or credit(false)
+     * @return string Response message from server
      */
     public function addCourse($courseAbbr, $courseCode, $section, $nc = false)
     {
@@ -92,16 +102,27 @@ class CourselistMaker
             $postData["rcourse" . $i] = "";
         }
 
-        while (($addCourseResponse = $this->curlHandler->get("https://registration.boun.edu.tr/scripts/studentaction.asp", $postData)) === false) {
+        while (($addCourseResponse = $this->curlHandler->get("https://registration.boun.edu.tr/scripts/studentaction.asp", $postData, [
+                CURLOPT_REFERER => "https://registration.boun.edu.tr/scripts/student.asp"
+            ])) === false) {
             echo "- Couldn't reach the course list preparation page, trying again." . PHP_EOL;
             $this->sleep();
         }
 
-        echo "+ Course add request is sent, your response:" . PHP_EOL;
         preg_match("#Add[^-]*Drop[^-]*Action[^-]*Warnings[^-]*Start[^>]*>(.*?)<!---#si", $addCourseResponse, $responseWarnings);
+        while(!array_key_exists(1, $responseWarnings)){
+        	while (($addCourseResponse = $this->curlHandler->get("https://registration.boun.edu.tr/scripts/studentaction.asp", $postData, [
+                CURLOPT_REFERER => "https://registration.boun.edu.tr/scripts/student.asp"
+            ])) === false) {
+            	echo "- Couldn't reach the course list preparation page, trying again." . PHP_EOL;
+            	$this->sleep();
+        	}
+        	preg_match("#Add[^-]*Drop[^-]*Action[^-]*Warnings[^-]*Start[^>]*>(.*?)<!---#si", $addCourseResponse, $responseWarnings);
+        }
+        echo "+ Course add request is sent, your response:" . PHP_EOL;
         $responseWarnings = preg_replace("/\s+/", " ", strip_tags($responseWarnings[1]));
         echo $responseWarnings . PHP_EOL;
-
+        return $responseWarnings;
     }
 
     public function sendConsent($courseAbbr, $courseCode, $section, $msg)
