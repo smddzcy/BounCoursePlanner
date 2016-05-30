@@ -65,13 +65,16 @@ class CoursePlanner
             $hours = [];
             foreach ($courseDetails as $section => $details) { // 0 days 1 hours
                 $courseDays = preg_split("/([A-Z][a-z]*)/", $details[0], -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+                if (empty($courseDays)) {
+                    throw new Exception($name . " has no schedule details or corrupt details.");
+                }
                 $courseHours = [];
                 if (strlen(preg_replace('![^A-Z]+!', null, $details[0])) == strlen($details[1])) {
                     $courseHours = str_split($details[1]);
                 } else {
                     for ($i = 0; $i < strlen($details[1]); ++$i) {
                         if (!empty($courseHours)) {
-                            $el = (int) array_pop($courseHours);
+                            $el = (int)array_pop($courseHours);
                             if (($newEl = 10 * $el + $details[1]{$i}) > 11) {
                                 array_push($courseHours, $el);
                                 array_push($courseHours, $details[1]{$i});
@@ -100,14 +103,14 @@ class CoursePlanner
         if (!preg_match("#[^0-9]#i", $hour))
             foreach (self::DEFAULT_DAYS as $day)
                 $this->unwantedHours[] = $day . $hour;
-            else
-                $this->unwantedHours[] = $hour;
-        }
+        else
+            $this->unwantedHours[] = $hour;
+    }
 
-        public function getConflict(): int
-        {
-            return $this->conflict;
-        }
+    public function getConflict(): int
+    {
+        return $this->conflict;
+    }
 
     /**
      * @param int $j
