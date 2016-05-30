@@ -15,6 +15,7 @@ $(document).ready(function () {
     var cList = $('#course-list');
     var pagination = $('.pagination');
     var breadcrumb = $('#breadcrumb');
+    var semesters = $("#semesters");
     // popup for share buttons
     $('a.popup').on('click', function () {
         var newwindow = window.open($(this).attr('href'), '', 'height=400,width=600');
@@ -29,6 +30,21 @@ $(document).ready(function () {
         offLabel: '<span class="glyphicon glyphicon-remove">',
         onLabel: '<span class="glyphicon glyphicon-ok">'
     });
+
+    // fill semester picker
+    var semesterData = process("getSemesters", 1);
+    if (semesterData.length) {
+        for (i in semesterData) {
+            if (semesterData.hasOwnProperty(i) && semesterData[i].length) {
+                var year, semester;
+                year = parseInt(semesterData[i][0]);
+                semester = parseInt(semesterData[i][1]);
+                semesters.append(
+                    '<li><a href="#" class="chooseSemester" data-year="' + year + '" data-semester="' + semester + '">' + year + '/' + (year + 1) + '-' + semester + '</a></li>'
+                );
+            }
+        }
+    }
 
     // auto-completion for course names
     var availableTags = process("getAvailableCourses", 1);
@@ -68,13 +84,22 @@ $(document).ready(function () {
         }
     });
 
-    cInsert.keyup(function(event) {
+    cInsert.keyup(function (event) {
         cInsert.val(cInsert.val().turkishToUpper());
     });
 
+
     String.prototype.turkishToUpper = function () {
         var string = this;
-        var letters = {"i": "I", "ş": "S", "ğ": "G", "ü": "U", "ö": "O", "ç": "C", "ı": "I"};
+        var letters = {
+            "i": "I",
+            "ş": "S",
+            "ğ": "G",
+            "ü": "U",
+            "ö": "O",
+            "ç": "C",
+            "ı": "I"
+        };
         string = string.replace(/[iışğüçö]+/g, function (letter) {
             return letters[letter];
         });
@@ -90,7 +115,8 @@ $(document).ready(function () {
     };
 
     Object.size = function (obj) {
-        var size = 0, key;
+        var size = 0,
+            key;
         for (key in obj) {
             if (obj.hasOwnProperty(key)) size++;
         }
@@ -111,7 +137,9 @@ $(document).ready(function () {
             return;
         }
         if ('.nothing-message') {
-            $('.nothing-message').hide('slide', {direction: 'left'}, 300)
+            $('.nothing-message').hide('slide', {
+                direction: 'left'
+            }, 300)
         }
         var newCourse = '<li>' + '<p>' + course + '</p>' + '</li>';
         $('#course-list').append(newCourse);
@@ -134,31 +162,50 @@ $(document).ready(function () {
                 freeHours.push(intToDay[el.getAttribute('data-day')] + el.getAttribute('data-time').split(":")[0].replace(/^0/, ''));
         });
 
-        var result = process("findBestPlan", {
-            "courseList": courseList,
-            "freeHours": freeHours,
-            "showDuplicates": $("#show-duplicates").prop('checked')
-        });
-
-        var conflict = result["conflict"];
-        plans = result["plans"];
-        var plansSize = Object.size(plans);
-
-        pagination.html('');
-        pagination.append('<li><a id="prev">«</a></li>');
-        for (var i = 1; i <= plansSize; i++) {
-            pagination.append('<li><a class="load-plan" data-item-id="' + (i - 1) + '">' + i + '</a></li>');
+        var result;
+        var chosenSemester = $('.chooseSemester.active');
+        if (chosenSemester.length) {
+            result = process("findBestPlan", {
+                "year": chosenSemester.data('year'),
+                "semester": chosenSemester.data('semester'),
+                "courseList": courseList,
+                "freeHours": freeHours,
+                "showDuplicates": $("#show-duplicates").prop('checked')
+            });
+        } else {
+            result = process("findBestPlan", {
+                "courseList": courseList,
+                "freeHours": freeHours,
+                "showDuplicates": $("#show-duplicates").prop('checked')
+            });
         }
-        pagination.append('<li><a id="next">»</a></li>');
 
-        //noinspection JSValidateTypes
-        $('.load-plan[data-item-id="' + curr + '"]').parent().addClass('active');
-        if (breadcrumb.hasClass('hidden'))
-            breadcrumb.removeClass('hidden');
+        if (Object.size(result) == 0) {
+            alert("Sorry, we couldn't find any course plan.")
+        } else if (result.hasOwnProperty("error")) {
+            alert(result["error"]);
+        } else {
 
-        loadPlan(curr);
-        $('#possible-schedules').html(plansSize);
-        $('#conflicted-hours').html(conflict);
+            var conflict = result["conflict"];
+            plans = result["plans"];
+            var plansSize = Object.size(plans);
+
+            pagination.html('');
+            pagination.append('<li><a id="prev">«</a></li>');
+            for (var i = 1; i <= plansSize; i++) {
+                pagination.append('<li><a class="load-plan" data-item-id="' + (i - 1) + '">' + i + '</a></li>');
+            }
+            pagination.append('<li><a id="next">»</a></li>');
+
+            //noinspection JSValidateTypes
+            $('.load-plan[data-item-id="' + curr + '"]').parent().addClass('active');
+            if (breadcrumb.hasClass('hidden'))
+                breadcrumb.removeClass('hidden');
+
+            loadPlan(curr);
+            $('#possible-schedules').html(plansSize);
+            $('#conflicted-hours').html(conflict);
+        }
     });
 
     cList.on('click', 'li', function () {
@@ -206,6 +253,20 @@ $(document).ready(function () {
         }
     });
 
+    var semesterText = $("#semesterText");
+    $('.chooseSemester').on('click', function () {
+        $('button#clear-all-courses').click();
+        $('.chooseSemester.active').removeClass('active');
+        $(this).addClass('active');
+        semesterText.html('<b>S: ' + $(this).html() + '</b>');
+        availableTags = process("getAvailableCourses", {
+            "year": $(this).data('year'),
+            "semester": $(this).data('semester')
+        });
+        availableTagsWithSections = availableTags[1];
+        availableTags = availableTags[0];
+    });
+
 
     // re-render the homepage with new language
     //$(document).on('click', '.lang', function () {
@@ -249,12 +310,14 @@ function loadPlan(i) {
                 putCourse(cName + "." + section, cHours[section][hour]);
     }
 }
+
 function process(funcName, data) {
     var ret;
     $.ajax({
         type: "POST",
         url: "http://localhost/BounCoursePlanner/AjaxHandler.php",
         async: false,
+        timeout: 30000, // 30 secs timeout, may be changed - or parametrized ? 
         data: {
             function: funcName,
             data: data
