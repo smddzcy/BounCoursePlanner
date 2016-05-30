@@ -3,12 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="ef6f392b-4f29-45ed-aea8-fb4895a263c6" name="Default" comment="simple improvements">
       <change type="DELETED" beforePath="$PROJECT_DIR$/FreeRoomFinder.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/db/course_details.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/db/course_programs.txt" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/roomz.php" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/encodings.xml" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CourseFetcher.php" afterPath="$PROJECT_DIR$/CourseFetcher.php" />
     </list>
     <ignored path="BounCoursePlanner.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -279,7 +275,7 @@
       <workItem from="1461859825923" duration="8000" />
       <workItem from="1462114602324" duration="9000" />
       <workItem from="1464480229653" duration="3791000" />
-      <workItem from="1464557475762" duration="6352000" />
+      <workItem from="1464557475762" duration="6420000" />
     </task>
     <task id="LOCAL-00001" summary="v1.1 - explicit section usage added">
       <created>1453657267824</created>
@@ -379,11 +375,18 @@
       <option name="project" value="LOCAL" />
       <updated>1464599848420</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="simple improvements">
+      <created>1464606651866</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1464606651867</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="15379000" />
+    <option name="totallyTimeSpent" value="15447000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -396,9 +399,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1280" height="800" extended-state="0" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21324718" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21324718" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32998326" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32998326" sideWeight="0.5" order="10" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -439,14 +442,14 @@
     <MESSAGE value="+ Free room finder UI." />
     <MESSAGE value="+ maker updated&#10;" />
     <MESSAGE value="Semester fetcher and custom semesters added" />
-    <MESSAGE value="simple improvements" />
     <MESSAGE value="semester selector added&#10;" />
     <MESSAGE value="sync with other files" />
     <MESSAGE value="semester selector styles" />
     <MESSAGE value="simple improvements, sync with backend" />
     <MESSAGE value="semester select texts added" />
     <MESSAGE value="limit change" />
-    <option name="LAST_COMMIT_MESSAGE" value="limit change" />
+    <MESSAGE value="simple improvements" />
+    <option name="LAST_COMMIT_MESSAGE" value="simple improvements" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
