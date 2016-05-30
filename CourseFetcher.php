@@ -198,4 +198,37 @@ class CourseFetcher
 
         return $arr;
     }
+
+    /**
+     * @return string
+     */
+    public function getYear()
+    {
+        return $this->year;
+    }
+
+    /**
+     * @param string $year
+     */
+    public function setYear($year)
+    {
+        $this->year = $year;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSemester()
+    {
+        return $this->semester;
+    }
+
+    /**
+     * @param string $semester
+     */
+    public function setSemester($semester)
+    {
+        $this->semester = $semester;
+    }
+
 }
