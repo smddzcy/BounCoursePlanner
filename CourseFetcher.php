@@ -75,7 +75,7 @@ class CourseFetcher
      * @var int $limit Limit the fetched semester count
      * @return array Year-semester datas as nested arrays
      */
-    public function getSemesters(int $limit = 15)
+    public function getSemesters(int $limit = 10)
     {
         $schedulePageData = $this->curlHandler->get(self::BASEURL . "/schedule.htm");
         preg_match_all("#<option[^>]*value='([^']*)'#si", $schedulePageData, $semesterDatas);
