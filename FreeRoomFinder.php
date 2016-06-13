@@ -106,7 +106,6 @@ class FreeRoomFinder
      */
     public function filterByHour($hour): bool
     {
-
         if ((!is_string($hour) && !is_int($hour)) || $hour < 9 || $hour > 19) return false;
         $this->hour = (int)$hour;
         return true;

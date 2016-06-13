@@ -40,13 +40,12 @@ class CourselistMaker
             echo "- Couldn't reach the login page, trying again." . PHP_EOL;
             $this->sleep();
         }
-        if(preg_match("#30 seconds#si", $loginResponse)){
-            echo "- Waiting 30 seconds to login". PHP_EOL;
+        if (preg_match("#30 seconds#si", $loginResponse)) {
+            echo "- Waiting 30 seconds to login" . PHP_EOL;
             sleep(30);
             $this->login($userid, $pass);
             return;
-        }
-        else if (preg_match("#(Invalid login)|(Wrong User)#si", $loginResponse)) {
+        } else if (preg_match("#(Invalid login)|(Wrong User)#si", $loginResponse)) {
             echo "- Invalid user ID & password combination." . PHP_EOL;
             return;
         }
@@ -110,14 +109,14 @@ class CourselistMaker
         }
 
         preg_match("#Add[^-]*Drop[^-]*Action[^-]*Warnings[^-]*Start[^>]*>(.*?)<!---#si", $addCourseResponse, $responseWarnings);
-        while(!array_key_exists(1, $responseWarnings)){
-        	while (($addCourseResponse = $this->curlHandler->get("https://registration.boun.edu.tr/scripts/studentaction.asp", $postData, [
-                CURLOPT_REFERER => "https://registration.boun.edu.tr/scripts/student.asp"
-            ])) === false) {
-            	echo "- Couldn't reach the course list preparation page, trying again." . PHP_EOL;
-            	$this->sleep();
-        	}
-        	preg_match("#Add[^-]*Drop[^-]*Action[^-]*Warnings[^-]*Start[^>]*>(.*?)<!---#si", $addCourseResponse, $responseWarnings);
+        while (!array_key_exists(1, $responseWarnings)) {
+            while (($addCourseResponse = $this->curlHandler->get("https://registration.boun.edu.tr/scripts/studentaction.asp", $postData, [
+                    CURLOPT_REFERER => "https://registration.boun.edu.tr/scripts/student.asp"
+                ])) === false) {
+                echo "- Couldn't reach the course list preparation page, trying again." . PHP_EOL;
+                $this->sleep();
+            }
+            preg_match("#Add[^-]*Drop[^-]*Action[^-]*Warnings[^-]*Start[^>]*>(.*?)<!---#si", $addCourseResponse, $responseWarnings);
         }
         echo "+ Course add request is sent, your response:" . PHP_EOL;
         $responseWarnings = preg_replace("/\s+/", " ", strip_tags($responseWarnings[1]));
@@ -125,9 +124,48 @@ class CourselistMaker
         return $responseWarnings;
     }
 
+    public function changeSection($courseAbbr, $courseCode, $newSection)
+    {
+        if (strlen((string)$newSection) == 1) $newSection = "0" . $newSection;
+        $this->checkLoginStatus();
+
+        /* Not necessary, lel.
+        $postData = [
+            "R1" => "{$courseAbbr}  {$courseCode}." . str_pad($section, 2, "0", STR_PAD_LEFT) . ".0.0",
+            "D1" => "REQUIRED COURSE",
+            "B1" => "Change Section",
+            "formaction" => ""
+        ];
+        while (($changeSectionResponse = $this->curlHandler->get("https://registration.boun.edu.tr/scripts/studentaction.asp", $postData, [
+                CURLOPT_REFERER => "https://registration.boun.edu.tr/scripts/student.asp"
+            ])) === false) {
+            echo "- Couldn't reach the change section page, trying again." . PHP_EOL;
+            $this->sleep();
+        }
+        */
+
+        $postData = [
+            "B1" => "Change",
+            "R1" => "{$courseAbbr}  {$courseCode}.{$newSection}"
+        ];
+
+        while (($changeSectionResponse = $this->curlHandler->get("https://registration.boun.edu.tr/scripts/secchaact.asp", $postData, [
+                CURLOPT_REFERER => "https://registration.boun.edu.tr/scripts/studentaction.asp"
+            ])) === false) {
+            echo "- Couldn't make the section change request, trying again." . PHP_EOL;
+            $this->sleep();
+        }
+        preg_match("#<FONT[^>]*>(.*?)</FONT>#si", $changeSectionResponse, $responseWarnings);
+
+        echo "+ Change section request is sent for {$courseAbbr} {$courseCode}.{$newSection}, your response:" . PHP_EOL;
+        $responseWarnings = preg_replace("/\s+/", " ", strip_tags($responseWarnings[1]));
+        echo $responseWarnings . PHP_EOL;
+        return $responseWarnings;
+    }
+
     public function sendConsent($courseAbbr, $courseCode, $section, $msg)
     {
-        if (strlen($section) == 1) $section = "0" . $section;
+        if (strlen((string)$section) == 1) $section = "0" . $section;
         if (strlen($msg) > 400) {
             echo "- Your message is too long, it can have a max. of 400 characters." . PHP_EOL;
             return;
@@ -183,7 +221,7 @@ class CourselistMaker
 
     public function displayCurrentCourses()
     {
-        if (empty($this->currCourses)){
+        if (empty($this->currCourses)) {
             $this->getCurrentCourses();
             return;
         }
