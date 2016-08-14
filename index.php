@@ -155,9 +155,9 @@ $langClass->setUserLanguage($userLang);
 </div>
 
 <script type="text/javascript">
-    const COURSE_ALREADY_ADDED = "<?php echo $langClass->lang['COURSE_ALREADY_ADDED']; ?>";
-    const COURSE_NOT_VALID = "<?php echo $langClass->lang['COURSE_NOT_VALID']; ?>";
-    const COURSE_EMPTY = "<?php echo $langClass->lang['COURSE_EMPTY']; ?>";
+    var COURSE_ALREADY_ADDED = "<?php echo $langClass->lang['COURSE_ALREADY_ADDED']; ?>";
+    var COURSE_NOT_VALID = "<?php echo $langClass->lang['COURSE_NOT_VALID']; ?>";
+    var COURSE_EMPTY = "<?php echo $langClass->lang['COURSE_EMPTY']; ?>";
 </script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
