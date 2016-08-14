@@ -65,19 +65,12 @@ $langClass->setUserLanguage($userLang);
             <li><a class="popup"
                    href="https://www.tumblr.com/widgets/share/tool/preview?shareSource=legacy&canonicalUrl=&url=<?php echo urlencode(HOMEPAGE); ?>&posttype=link&title=<?php echo urlencode($langClass->lang['PAGE_TITLE']); ?>&caption=<?php echo urlencode($langClass->lang['SHARE_TEXT']); ?>&content=<?php echo urlencode(HOMEPAGE); ?>"
                    target="_blank"><i class="fa fa-lg fa-tumblr"></i></a></li>
-            <li><a class="popup"
-                   href="https://www.pinterest.com/pin/create/button/?url=<?php echo rawurlencode(HOMEPAGE); ?>&description=<?php echo rawurlencode($langClass->lang['SHARE_TEXT']); ?>"
-                   target="_blank"><i class="fa fa-lg fa-pinterest"></i></a></li>
                    <div id="lineBreak" style="display:none">&nbsp;</div>
-                   <li <?php if ($userLang == 'en') {
-       echo 'class="active"';
-       } ?>><a href="" class="lang"
-                                                                                   onclick="process('changeLang','en')">EN</a>
+                   <li <?php if ($userLang == 'en') { echo 'class="active"'; } ?>>
+                     <a href="" class="lang" onclick="process('changeLang','en')">EN</a>
                    </li>
-                   <li <?php if ($userLang == 'tr') {
-       echo 'class="active"';
-       } ?>><a href="" class="lang"
-                                                                                   onclick="process('changeLang','tr')">TR</a>
+                   <li <?php if ($userLang == 'tr') { echo 'class="active"';} ?>>
+                     <a href="" class="lang" onclick="process('changeLang','tr')">TR</a>
                    </li>
         </ul>
     </div>

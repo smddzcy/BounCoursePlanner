@@ -79,7 +79,7 @@
 }
 
 .schedule-rows .time-slot {
-    font-size: 1.9vmin !important;
+    font-size: 12px;
     color: #fff;
 }
 
@@ -253,7 +253,7 @@
 }
 
 #course-container .nothing-message {
-    height: 160px;
+    height: 60px;
     color: #666;
     background-size: 15%;
 }

@@ -1,14 +1,12 @@
 <?php
 
 /**
- * Class CurlRequest
+ * Class CurlRequest.
  *
  * @author Samed Düzçay <samedduzcay@gmail.com>
  *
  * @description Makes cURL requests.
- *
  */
-
 class CurlRequest
 {
     const USERAGENT = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0';
@@ -83,10 +81,12 @@ class CurlRequest
     }
 
     /**
-     * Makes cURL requests
-     * @param string $url Request will be made to this URL
+     * Makes cURL requests.
+     *
+     * @param string       $url      Request will be made to this URL
      * @param string|array $postData If set, this data will be posted to the URL
-     * @param array $extra Extra cURL options array
+     * @param array        $extra    Extra cURL options array
+     *
      * @return mixed HTML response of request (entity decoded)
      */
     public function get($url = null, $postData = null, $extra = array())
@@ -112,20 +112,25 @@ class CurlRequest
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        if (!empty($extra))
+        if (!empty($extra)) {
             curl_setopt_array($ch, $extra);
-        elseif (!empty($this->extra))
+        } elseif (!empty($this->extra)) {
             curl_setopt_array($ch, $this->extra);
+        }
         $run = curl_exec($ch);
-        if ($run === false)
+        if ($run === false) {
             return false;
+        }
         curl_close($ch);
+
         return $this->fixQuotes($run);
     }
 
     /**
-     * Fixes curly quotes
+     * Fixes curly quotes.
+     *
      * @param string $data HTML data
+     *
      * @return mixed
      */
     public function fixQuotes($data)
@@ -159,19 +164,22 @@ class CurlRequest
         );
         $chr = array_keys($chr_map);
         $rpl = array_values($chr_map);
-        $data = str_replace($chr, $rpl, html_entity_decode($data, ENT_QUOTES, "UTF-8"));
+
+        // UTF-8ize
+        $data = str_replace($chr, $rpl, mb_convert_encoding(html_entity_decode($data, ENT_QUOTES, 'ISO-8859-1'), 'UTF-8', 'ISO-8859-9'));
+        $data = preg_replace("/[^\x01-\x7FĞÜŞİÇÖğüşıç]/", '', $data);
+
         return $data;
     }
 
     /**
      * CurlRequest constructor.
      *
-     * @param string $url URL to be requested
-     *
+     * @param string     $url  URL to be requested
      * @param array|null $args
-     * 'cookie' or 'cookiefile' => cookie file path,
-     * 'post' or 'postdata' => post data, if you want a post request
-     * 'extra' => an array of curlopt_ options, if you want extra options or to override default options
+     *                         'cookie' or 'cookiefile' => cookie file path,
+     *                         'post' or 'postdata' => post data, if you want a post request
+     *                         'extra' => an array of curlopt_ options, if you want extra options or to override default options
      */
     public function __construct($url = null, $args = null)
     {
@@ -196,5 +204,4 @@ class CurlRequest
     {
         return $this->get();
     }
-
 }
