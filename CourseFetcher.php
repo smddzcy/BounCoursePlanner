@@ -29,7 +29,7 @@ class CourseFetcher
     /**
      * If true, it also fetches the problem sessions.
      */
-    const PROBLEMSESSIONS = false;
+    const PROBLEMSESSIONS = true;
     const FILENAME_DETAILS = 'db/%s,%s-course_details.txt';
     const FILENAME_PROGRAMS = 'db/%s,%s-course_programs.txt';
     const BASEURL = 'http://registration.boun.edu.tr';
@@ -160,12 +160,11 @@ class CourseFetcher
                     continue;
                 }
 
-                // [1]: Instr. [2]: Days [3]: Hours [4]: Classes [5]: Codes.Sections
                 // Code.Section, Name, Credits, Instr, Days, Hours, Classes
                 preg_match('#<td>(.*?)</td>[^<]*<td>.*?</td>[^<]*<td>([^<]*)</td>[^<]*<td>([^<]*)</td>[^<]*<td>[^<]*</td>(.*?</a>)?.*?<td>([^<]*)</td>[^<]*<td>([^<]*)</td>[^<]*<td>([^<]*)</td>[^<]*<td>(.*?)</td>#si', $section, $details);
                 $this->cleanArray($details);
                 // No hour details, skip
-                if (preg_match('#TBA#si', $details[2])) {
+                if (preg_match('#TBA#si', $details[6])) {
                     continue;
                 }
 
@@ -180,6 +179,11 @@ class CourseFetcher
                 // If course code is empty, then it belongs to a parent course.
                 $det = null;
                 if (empty($courseCode)) {
+                    // Details' indices increase by 1 if courseCode is empty.
+                    $courseInstr = $this->trueTrim($details[6]);
+                    $courseDays = $this->trueTrim($details[7]);
+                    $courseHours = $this->trueTrim($details[8]);
+                    // Get the main course field, it's a LAB or P.S.
                     $det = $this->programDetails[$lastCourseCode][$lastCourseSection];
                 } else {
                     if (!array_key_exists($courseCode, $this->programDetails)) {
@@ -202,7 +206,7 @@ class CourseFetcher
                     $det[3] .= empty($det[3]) ? $courseInstr : ' | '.$courseInstr;
                 }
 
-                $this->programDetails[$courseCode][$courseSection] = $det;
+                $this->programDetails[$lastCourseCode][$lastCourseSection] = $det;
             }
         }
 
