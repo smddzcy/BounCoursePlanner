@@ -42,7 +42,7 @@ class CourselistMaker
         }
         if (preg_match("#30 seconds#si", $loginResponse)) {
             echo "- Waiting 30 seconds to login" . PHP_EOL;
-            sleep(30);
+            sleep(5);
             $this->login($userid, $pass);
             return;
         } else if (preg_match("#(Invalid login)|(Wrong User)#si", $loginResponse)) {
