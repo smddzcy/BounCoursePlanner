@@ -199,8 +199,9 @@ class CourselistMaker
         }
         echo "+ Student page is opened." . PHP_EOL;
         if (!preg_match_all('!<input[^>]*type="radio"[^>]*name="R1"[^>]*value="([^"]*)">[^<]*</td>.*?<a[^>]*href="#"[^>]*courseDesc[^>]*>([^<]*)</a>(.*?)</tr>!si', $stdPage, $courseData)) {
-            echo "- This shouldn't happen, something really bad is happened. Check the regexp." . PHP_EOL;
-            die();
+            echo "Student page is broken. (It can be a regex problem though) Trying again." . PHP_EOL;
+            $this->getCurrentCourses();
+            return;
         }
         for ($i = 0; $i < count($courseData[1]); ++$i) {
             preg_match("#.*<div[^>]*>([^<]*)<#si", $courseData[3][$i], $courseHours);
