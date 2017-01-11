@@ -4,3 +4,5 @@ roomz.php
 Test.php
 db
 tmp/*
+.htaccess
+_update.php
