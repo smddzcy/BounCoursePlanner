@@ -52,6 +52,7 @@ class CoursePlanner
    */
   public function addCourse(String $name, int $code = null, array $hours = null)
   {
+      $credit = null;
       if (is_null($hours)) {
           if (!is_null($code)) {
               $name .= $code;
@@ -65,7 +66,7 @@ class CoursePlanner
           $courseFetcher = new CourseFetcher((int) $this->year, (int) $this->semester);
           if (strpos($name, '.') !== false) {
               // contains explicit section detail
-        list($name, $section) = explode('.', $name);
+              list($name, $section) = explode('.', $name);
               $courseDetails = $courseFetcher->getDetails($name);
               if (!array_key_exists($section, $courseDetails)) {
                   throw new Exception($name.'.'.$section.' cannot be added; course does not have that section for the semester.');
@@ -81,8 +82,12 @@ class CoursePlanner
 
           $hours = [];
           foreach ($courseDetails as $section => $details) {
+              // Set the course credit
+              if (empty($credit)) {
+                $credit = $details[4];
+              }
               // 0 days 1 hours
-        $courseDays = preg_split('/([A-Z][a-z]*)/', $details[0], -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+              $courseDays = preg_split('/([A-Z][a-z]*)/', $details[0], -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
               if (empty($courseDays)) {
                   throw new Exception($name.' has no schedule details or corrupt details.');
               }
@@ -111,7 +116,7 @@ class CoursePlanner
               $hours[] = [$section => $courseDays];
           }
       }
-      $this->courseList[] = new Course($name, $hours);
+      $this->courseList[] = new Course($name, $hours, (int) $credit);
   }
 
   /**
@@ -140,7 +145,8 @@ class CoursePlanner
    */
   private function generatePlans(int $j, bool $duplicateHours = false)
   {
-      $hours = $this->courseList[$j]->getHours();
+      $course = $this->courseList[$j];
+      $hours = $course->getHours();
       if ($duplicateHours === false) {
           $newHours = [];
           foreach ($hours as $hourSet) {
@@ -154,7 +160,7 @@ class CoursePlanner
           }
       }
       for ($i = 0; $i < count($hours); ++$i) {
-          array_push($this->plan, new Course($this->courseList[$j]->getName(), (array) $hours[$i]));
+          array_push($this->plan, new Course($course->getName(), (array) $hours[$i], $course->getCredit()));
           if ($j !== count($this->courseList) - 1) {
               $this->generatePlans($j + 1, $duplicateHours);
           } elseif (!empty($this->plan)) {

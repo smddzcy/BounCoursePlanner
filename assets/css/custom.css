@@ -377,3 +377,21 @@
 .dropdown-menu > li {
   width: 100%;
 }
+
+.table-bottom-status-row {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.7rem;
+}
+
+.table-bottom-status-row > div {
+  margin: 0 3%;
+}
+
+@media (max-width: 940px) {
+  .inline li.lang, .inline li.share-text {
+    padding-left: 15px !important;
+  }
+}

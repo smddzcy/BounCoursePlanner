@@ -53,7 +53,7 @@ $langClass->setUserLanguage($userLang);
               </ul>
           </li>
           <div id="lineBreak" style="display:none">&nbsp;</div>
-            <li style="padding-left:14px !important"><p class="navbar-text"><?php echo $langClass->lang['SHARE']; ?>: </p></li>
+            <li class="share-text"><p class="navbar-text"><?php echo $langClass->lang['SHARE']; ?>: </p></li>
             <li><a class="popup"
                    href="https://www.facebook.com/sharer/sharer.php?u=<?php echo urlencode(HOMEPAGE); ?>"
                    target="_blank"><i class="fa fa-lg fa-facebook"></i></a></li>
@@ -66,11 +66,11 @@ $langClass->setUserLanguage($userLang);
                    href="https://www.tumblr.com/widgets/share/tool/preview?shareSource=legacy&canonicalUrl=&url=<?php echo urlencode(HOMEPAGE); ?>&posttype=link&title=<?php echo urlencode($langClass->lang['PAGE_TITLE']); ?>&caption=<?php echo urlencode($langClass->lang['SHARE_TEXT']); ?>&content=<?php echo urlencode(HOMEPAGE); ?>"
                    target="_blank"><i class="fa fa-lg fa-tumblr"></i></a></li>
                    <div id="lineBreak" style="display:none">&nbsp;</div>
-                   <li <?php if ($userLang == 'en') { echo 'class="active"'; } ?>>
-                     <a href="" class="lang" onclick="process('changeLang','en')">EN</a>
+                   <li class="lang <?php if ($userLang === 'en') { echo 'active'; } ?>">
+                     <a href="" class="lang" onclick="processReq('changeLang','en')">EN</a>
                    </li>
-                   <li <?php if ($userLang == 'tr') { echo 'class="active"';} ?>>
-                     <a href="" class="lang" onclick="process('changeLang','tr')">TR</a>
+                   <li class="lang <?php if ($userLang === 'tr') { echo 'active'; } ?>">
+                     <a href="" class="lang" onclick="processReq('changeLang','tr')">TR</a>
                    </li>
         </ul>
     </div>
@@ -138,14 +138,18 @@ $langClass->setUserLanguage($userLang);
         <br/>
 
         <ol class="breadcrumb text-center hidden" id="breadcrumb">
-            <ul class="pagination pagination-lg" style="margin:5px 0;">
+            <ul class="pagination pagination-lg" style="margin:10px 0;">
             </ul>
-            <h4>
-                <p style="float:left;margin-left:5%;"><?php echo $langClass->lang['POSSIBLE_SCHEDULES']; ?>: <strong
-                        id="possible-schedules"></strong></p>
-                <p style="float:right;margin-right:5%;"><?php echo $langClass->lang['CONFLICTED_HOURS']; ?>: <strong
-                        id="conflicted-hours"></strong></p>
-            </h4>
+            <div class="table-bottom-status-row"><!--
+            --><div><?php echo $langClass->lang['POSSIBLE_SCHEDULES']; ?>:
+                  <strong id="possible-schedules"></strong>
+                </div><!--
+                --><div><?php echo $langClass->lang['CONFLICTED_HOURS']; ?>:
+                      <strong id="conflicted-hours"></strong>
+                </div><!--
+                --><div><?php echo $langClass->lang['TOTAL_CREDIT']; ?>:
+                  <strong id="total-credit"></strong></div><!--
+            --></div>
             <div class="clearfix"></div>
         </ol>
 
@@ -158,10 +162,11 @@ $langClass->setUserLanguage($userLang);
     var COURSE_ALREADY_ADDED = "<?php echo $langClass->lang['COURSE_ALREADY_ADDED']; ?>";
     var COURSE_NOT_VALID = "<?php echo $langClass->lang['COURSE_NOT_VALID']; ?>";
     var COURSE_EMPTY = "<?php echo $langClass->lang['COURSE_EMPTY']; ?>";
+    var UNEXPECTED_ERROR = "<?php echo $langClass->lang['UNEXPECTED_ERROR']; ?>";
 </script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
-<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
+<script type="text/javascript" src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="assets/js/bootstrap-checkbox.min.js"></script>
 <script type="text/javascript" src="assets/js/social-share-kit.min.js"></script>
 <script type="text/javascript" src="assets/js/schedule.js"></script>

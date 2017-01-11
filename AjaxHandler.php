@@ -74,7 +74,9 @@ switch ($func) {
             foreach ($list as &$course) {
                 $cName = $course->getName();
                 $cHours = $course->getHours();
-                $course = ['course-name' => $cName, 'course-hours' => $cHours];
+                $cCredit = $course->getCredit();
+                $course = ['course-name' => $cName, 'course-hours' => $cHours,
+                  'course-credit' => $cCredit];
             }
         }
 

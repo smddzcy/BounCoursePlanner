@@ -27,7 +27,7 @@ class Course
     /**
      * @return int
      */
-    public function getCredit(): int
+    public function getCredit()
     {
         return $this->credit;
     }
@@ -35,7 +35,7 @@ class Course
     /**
      * @param int $credit
      */
-    public function setCredit(int $credit)
+    public function setCredit($credit)
     {
         $this->credit = $credit;
     }

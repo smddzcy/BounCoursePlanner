@@ -170,7 +170,7 @@ class CourseFetcher
 
                 list($courseCode, $courseSection) = explode('.', $this->trueTrim($details[1]));
                 $courseName = $this->trueTrim($details[2]);
-                $courseCredits = $this->trueTrim($details[3]);
+                $courseCredit = $this->trueTrim($details[3]);
                 $courseInstr = $this->trueTrim($details[5]);
                 $courseDays = $this->trueTrim($details[6]);
                 $courseHours = $this->trueTrim($details[7]);
@@ -204,6 +204,10 @@ class CourseFetcher
                 }
                 if (!empty($courseInstr)) {
                     $det[3] .= empty($det[3]) ? $courseInstr : ' | '.$courseInstr;
+                }
+                // 4th index is course credit
+                if (empty($det[4])) {
+                  $det[4] = (int) $courseCredit;
                 }
 
                 $this->programDetails[$lastCourseCode][$lastCourseSection] = $det;

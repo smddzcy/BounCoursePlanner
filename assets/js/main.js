@@ -49,6 +49,9 @@ $(document).ready(function() {
   var pagination = $('.pagination');
   var breadcrumb = $('#breadcrumb');
   var semesters = $("#semesters");
+  var possibleSchedulesEl = $('#possible-schedules');
+  var conflictedHoursEl = $('#conflicted-hours');
+  var totalCreditEl = $('#total-credit');
   // popup for share buttons
   $('a.popup').on('click', function() {
     var newwindow = window.open($(this).attr('href'), '', 'height=400,width=600');
@@ -68,7 +71,7 @@ $(document).ready(function() {
   // fill semester picker
   appendIndicator("#semesters", 2, "li", "text-align: center;width: 100%;margin:10px auto;");
 
-  process("getSemesters", 1, true, function(semesterData) {
+  processReq("getSemesters", 1, true, function(semesterData) {
     removeIndicator("#semesters", true);
     if (semesterData.length) {
       for (var i in semesterData) {
@@ -120,7 +123,7 @@ $(document).ready(function() {
   };
 
   // auto-completion for course names
-  process("getAvailableCourses", 1, true, function(availableTags) {
+  processReq("getAvailableCourses", 1, true, function(availableTags) {
     var availableTagsWithSections = availableTags[1];
     var currWithSections = false;
     availableTags = availableTags[0];
@@ -167,7 +170,7 @@ $(document).ready(function() {
 
       semesterText.html('<b>S: ' + $(this).html() + '</b>');
 
-      process("getAvailableCourses", {
+      processReq("getAvailableCourses", {
         "year": $(this).data('year'),
         "semester": $(this).data('semester')
       }, true, function(newTags) {
@@ -176,18 +179,16 @@ $(document).ready(function() {
       });
     });
 
-    //  add course button click function
-    $('button#add-course').on('click', function() {
-      var course = $('input[name=course-insert]').val().turkishToUpper();
-      if (course.length === 0) {
-        alert(COURSE_EMPTY);
+    var addCourseWithName = function(courseName, alertOnError = true){
+      if (courseName.length === 0) {
+        if(alertOnError) alert(COURSE_EMPTY);
         return;
-      } else if (availableTags.indexOf(course) == -1 && availableTagsWithSections.indexOf(course) == -1) {
-        alert(COURSE_NOT_VALID);
+      } else if (availableTags.indexOf(courseName) == -1 && availableTagsWithSections.indexOf(courseName) == -1) {
+        if(alertOnError) alert(COURSE_NOT_VALID);
         return;
-      } else if ($('#course-list:contains("' + (course.indexOf(".") !== -1 ? course.split(".")[0] : course) +
+      } else if ($('#course-list:contains("' + (courseName.indexOf(".") !== -1 ? courseName.split(".")[0] : courseName) +
           '")').length !== 0) {
-        alert(COURSE_ALREADY_ADDED);
+        if(alertOnError) alert(COURSE_ALREADY_ADDED);
         return;
       }
       if ('.nothing-message') {
@@ -195,10 +196,29 @@ $(document).ready(function() {
           direction: 'left'
         }, 300);
       }
-      var newCourse = '<li>' + '<p>' + course + '</p>' + '</li>';
+      var newCourse = '<li>' + '<p>' + courseName + '</p>' + '</li>';
       $('#course-list').append(newCourse);
       $('input').val('');
       $('#controls').fadeIn();
+
+      // Persist course in local storage
+      var cachedCourses = JSON.parse(localStorage.courses || '[]');
+      if (cachedCourses.indexOf(courseName) === -1) {
+        cachedCourses.push(courseName);
+        localStorage.courses = JSON.stringify(cachedCourses);
+      }
+    }
+
+    // Add cached courses if we have some
+    var cachedCourses = JSON.parse(localStorage.courses || '[]');
+    for (var i in cachedCourses) {
+      addCourseWithName(cachedCourses[i], false);
+    }
+
+    //  add course button click function
+    $('button#add-course').on('click', function() {
+      var courseName = $('input[name=course-insert]').val().turkishToUpper();
+      addCourseWithName(courseName);
     });
 
     // load the plan
@@ -217,48 +237,51 @@ $(document).ready(function() {
             /^0/, ''));
       });
 
-      var result;
       var chosenSemester = $('.chooseSemester.active');
-      if (chosenSemester.length) {
-        result = process("findBestPlan", {
+
+      callbackFn = function(result) {
+        if (Object.size(result) === 0) {
+          alert("Sorry, we couldn't find any course plan.");
+        } else if (result.hasOwnProperty("error")) {
+          alert(result.error);
+        } else {
+          curr = 0;
+          var conflict = result.conflict;
+          plans = result.plans;
+          var plansSize = Object.size(plans);
+
+          pagination.html('');
+          pagination.append('<li><a id="prev">«</a></li>');
+          for (var i = 1; i <= plansSize; i++) {
+            pagination.append('<li><a class="load-plan" data-item-id="' + (i - 1) + '">' + i +
+              '</a></li>');
+          }
+          pagination.append('<li><a id="next">»</a></li>');
+
+          $('.load-plan[data-item-id="' + curr + '"]').parent().addClass('active');
+          if (breadcrumb.hasClass('hidden'))
+            breadcrumb.removeClass('hidden');
+
+          loadPlan(curr);
+          possibleSchedulesEl.html(plansSize);
+          conflictedHoursEl.html(conflict);
+        }
+      }
+
+      if (chosenSemester.length > 0) {
+        processReq("findBestPlan", {
           "year": chosenSemester.data('year'),
           "semester": chosenSemester.data('semester'),
           "courseList": courseList,
           "freeHours": freeHours,
           "showDuplicates": $("#show-duplicates").prop('checked')
-        });
+        }, true, callbackFn);
       } else {
-        result = process("findBestPlan", {
+        processReq("findBestPlan", {
           "courseList": courseList,
           "freeHours": freeHours,
           "showDuplicates": $("#show-duplicates").prop('checked')
-        });
-      }
-
-      if (Object.size(result) === 0) {
-        alert("Sorry, we couldn't find any course plan.");
-      } else if (result.hasOwnProperty("error")) {
-        alert(result.error);
-      } else {
-        curr = 0;
-        var conflict = result.conflict;
-        plans = result.plans;
-        var plansSize = Object.size(plans);
-
-        pagination.html('');
-        pagination.append('<li><a id="prev">«</a></li>');
-        for (var i = 1; i <= plansSize; i++) {
-          pagination.append('<li><a class="load-plan" data-item-id="' + (i - 1) + '">' + i + '</a></li>');
-        }
-        pagination.append('<li><a id="next">»</a></li>');
-
-        $('.load-plan[data-item-id="' + curr + '"]').parent().addClass('active');
-        if (breadcrumb.hasClass('hidden'))
-          breadcrumb.removeClass('hidden');
-
-        loadPlan(curr);
-        $('#possible-schedules').html(plansSize);
-        $('#conflicted-hours').html(conflict);
+        }, true, callbackFn);
       }
     });
 
@@ -273,6 +296,12 @@ $(document).ready(function() {
         $('#controls').fadeOut();
         $('.nothing-message').show('fast');
       }
+
+      // Remove course from local storage
+      var cachedCourses = JSON.parse(localStorage.courses || '[]');
+      var index = cachedCourses.indexOf($(this).html());
+      cachedCourses.splice(index, 1);
+      localStorage.courses = JSON.stringify(cachedCourses);
     });
 
     // Clear all courses button
@@ -280,6 +309,9 @@ $(document).ready(function() {
       cList.find('li').remove();
       $('#controls').fadeOut();
       $('.nothing-message').show('fast');
+
+      // Clear local storage
+      localStorage.courses = '[]';
     });
 
     breadcrumb.on('click', '#next', function() {
@@ -317,42 +349,49 @@ $(document).ready(function() {
   //    });
   //});
 
+  var clearSchedule = function() {
+    var slots = $('.schedule-rows .time-slot');
+    if (slots === undefined || slots.length === 0) return;
+    slots.each(function(index) {
+      $(this).html("");
+      if ($(this).hasClass("contains-course"))
+        $(this).removeClass("contains-course");
+    });
+  }
+
+  var putCourse = function(name, hour) {
+    var dh = /^([^0-9]*)([0-9]*)$/ig.exec(hour);
+    var intD = Object.getKeyByValue(intToDay, dh[1]);
+    var h = dh[2].length === 1 ? "0" + dh[2] : dh[2];
+    var slot = $(".schedule-rows").find('.time-slot[data-day="' + intD + '"][data-time="' + h + ':00"]');
+    if (!slot.hasClass("contains-course"))
+      slot.addClass("contains-course");
+    slot.html(slot.html() + '<p class="text-center">' + name + '</p>');
+  }
+
+  var loadPlan = function(i) {
+    if (i < 0 || i >= Object.size(plans)) return false;
+    clearSchedule();
+
+    var totalCredit = plans[i]
+      .map(function(course) { return parseInt(course["course-credit"]) || NaN; })
+      .reduce(function(acc, el) { return acc + el; }, 0);
+    totalCreditEl.html(totalCredit);
+
+    for (var j = 0; j < Object.size(plans[i]); j++) {
+      var cName = plans[i][j]["course-name"];
+      var cHours = plans[i][j]["course-hours"];
+      var cCredit = plans[i]
+      var section = Object.keys(cHours)[0];
+      for (var hour in cHours[section])
+        if (cHours[section].hasOwnProperty(hour))
+          putCourse(cName + "." + section, cHours[section][hour]);
+    }
+  }
+
 });
 
-function clearSchedule() {
-  var slots = $('.schedule-rows .time-slot');
-  if (slots === undefined || slots.length === 0) return;
-  slots.each(function(index) {
-    $(this).html("");
-    if ($(this).hasClass("contains-course"))
-      $(this).removeClass("contains-course");
-  });
-}
-
-function putCourse(name, hour) {
-  var dh = /^([^0-9]*)([0-9]*)$/ig.exec(hour);
-  var intD = Object.getKeyByValue(intToDay, dh[1]);
-  var h = dh[2].length === 1 ? "0" + dh[2] : dh[2];
-  var slot = $(".schedule-rows").find('.time-slot[data-day="' + intD + '"][data-time="' + h + ':00"]');
-  if (!slot.hasClass("contains-course"))
-    slot.addClass("contains-course");
-  slot.html(slot.html() + '<p class="text-center">' + name + '</p>');
-}
-
-function loadPlan(i) {
-  if (i < 0 || i >= Object.size(plans)) return false;
-  clearSchedule();
-  for (var j = 0; j < Object.size(plans[i]); j++) {
-    var cName = plans[i][j]["course-name"];
-    var cHours = plans[i][j]["course-hours"];
-    var section = Object.keys(cHours)[0];
-    for (var hour in cHours[section])
-      if (cHours[section].hasOwnProperty(hour))
-        putCourse(cName + "." + section, cHours[section][hour]);
-  }
-}
-
-function process(funcName, data, isAsync, fn) {
+var processReq = function(funcName, data, isAsync, fn) {
   if (typeof isAsync === 'undefined' || isAsync === null) {
     isAsync = false;
   }
@@ -373,6 +412,10 @@ function process(funcName, data, isAsync, fn) {
       if (isAsync === true) {
         fn(returnData);
       }
+    },
+    error: function(xhr, status, errorThrown) {
+      console.log("error: ");
+      console.log(xhr);
     }
   });
   return ret;
