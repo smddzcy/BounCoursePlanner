@@ -191,11 +191,13 @@ $(document).ready(function() {
         if(alertOnError) alert(COURSE_ALREADY_ADDED);
         return;
       }
+
       if ('.nothing-message') {
         $('.nothing-message').hide('slide', {
           direction: 'left'
         }, 300);
       }
+
       var newCourse = '<li>' + '<p>' + courseName + '</p>' + '</li>';
       $('#course-list').append(newCourse);
       $('input').val('');
@@ -215,9 +217,20 @@ $(document).ready(function() {
       addCourseWithName(cachedCourses[i], false);
     }
 
+    var removedPanelText = false;
     //  add course button click function
     $('button#add-course').on('click', function() {
       var courseName = $('input[name=course-insert]').val().turkishToUpper();
+
+      // Remove the panel text, only once.
+      if (!removedPanelText) {
+        var panelText = $('#panel-text')[0];
+        if (panelText) {
+          panelText.parentNode.removeChild(panelText);
+          removedPanelText = true;
+        }
+      }
+
       addCourseWithName(courseName);
     });
 
@@ -416,6 +429,10 @@ var processReq = function(funcName, data, isAsync, fn) {
     error: function(xhr, status, errorThrown) {
       console.log("error: ");
       console.log(xhr);
+      ret = xhr;
+      if (isAsync === true) {
+        fn(xhr);
+      }
     }
   });
   return ret;

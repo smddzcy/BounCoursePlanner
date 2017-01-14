@@ -22,6 +22,8 @@ $langClass->setUserLanguage($userLang);
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="description" content="<?php echo $langClass->lang['SLOGAN']; ?>">
+    <meta name="keywords" content="boun,bcp,bogazici,bogazici university,bogazici universitesi,course planner,boun course planner">
     <title><?php echo $langClass->lang['PAGE_TITLE']; ?></title>
 </head>
 <body>
@@ -85,8 +87,7 @@ $langClass->setUserLanguage($userLang);
         </div>
         <div class="jumbotron" style="margin-top:20px; padding-bottom: 10px;">
             <div class="container">
-                <p><?php echo $langClass->lang['SLOGAN']; ?></p>
-
+                <p id="panel-text"><?php echo $langClass->lang['SLOGAN']; ?></p>
                 <div id="course-form">
                     <input id="course-insert" type="text" name="course-insert"
                            placeholder="<?php echo $langClass->lang['COURSE_NAME']; ?>">
