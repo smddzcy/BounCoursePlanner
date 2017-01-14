@@ -395,3 +395,13 @@
     padding-left: 15px !important;
   }
 }
+
+#main-panel {
+  margin-top:20px;
+  padding-bottom: 10px;
+  padding-top: 15px;
+}
+
+#panel-text {
+  padding-top: 30px;
+}

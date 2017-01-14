@@ -224,9 +224,15 @@ $(document).ready(function() {
 
       // Remove the panel text, only once.
       if (!removedPanelText) {
-        var panelText = $('#panel-text')[0];
-        if (panelText) {
-          panelText.parentNode.removeChild(panelText);
+        var panelText = $('#panel-text');
+        if (panelText.length > 0) {
+          // Fade out the panel text, then remove it after a second
+          panelText.fadeOut();
+          setTimeout(function(){
+            panelText[0].parentNode.removeChild(panelText[0]);
+          }, 1000);
+
+          $('#main-panel').addClass('focus');
           removedPanelText = true;
         }
       }

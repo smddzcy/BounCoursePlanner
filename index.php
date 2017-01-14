@@ -85,7 +85,7 @@ $langClass->setUserLanguage($userLang);
                 <small><?php echo $langClass->lang['COURSES']; ?></small>
             </h1>
         </div>
-        <div class="jumbotron" style="margin-top:20px; padding-bottom: 10px;">
+        <div class="jumbotron" id="main-panel">
             <div class="container">
                 <p id="panel-text"><?php echo $langClass->lang['SLOGAN']; ?></p>
                 <div id="course-form">
