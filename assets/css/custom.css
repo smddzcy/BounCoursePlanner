@@ -161,10 +161,13 @@
   padding: 0;
   margin-left: 5px;
 }
-#course-form input:focus, #course-form input:active, #course-form button:focus, #course-form button:active {
+#course-form input:focus, #course-form input:active{
   outline: #F0553B thin;
   -webkit-transition: all 0.3s;
           transition: all 0.3s;
+}
+button {
+  outline: 0 !important;
 }
 #course-form button {
   height: 80px;
