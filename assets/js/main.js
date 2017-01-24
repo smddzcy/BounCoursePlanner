@@ -123,10 +123,29 @@ $(document).ready(function() {
   };
 
   // auto-completion for course names
-  processReq("getAvailableCourses", 1, true, function(availableTags) {
-    var availableTagsWithSections = availableTags[1];
+  processReq("getAvailableCourses", 1, true, function(courseDetails) {
+    var availableTags, availableTagsWithSections, hoverDetails;
+
+    var fillArraysWithDetails = function(details) {
+      availableTags = [];
+      availableTagsWithSections = [];
+      hoverDetails = [];
+
+      for(var courseCode in courseDetails) {
+        if(!courseDetails.hasOwnProperty(courseCode)) continue;
+
+        availableTags.push(courseCode);
+        for (var section in courseDetails[courseCode]) {
+          if(!courseDetails[courseCode].hasOwnProperty(section)) continue;
+
+          availableTagsWithSections.push(courseCode + '.' + section);
+        }
+      }
+    };
+
+    fillArraysWithDetails(courseDetails);
+
     var currWithSections = false;
-    availableTags = availableTags[0];
 
     cInsert.autocomplete({
       source: function(request, response) {
@@ -173,13 +192,15 @@ $(document).ready(function() {
       processReq("getAvailableCourses", {
         "year": $(this).data('year'),
         "semester": $(this).data('semester')
-      }, true, function(newTags) {
-        availableTags = newTags[0];
-        availableTagsWithSections = newTags[1];
+      }, true, function(courseDetails) {
+        fillArraysWithDetails(courseDetails);
       });
     });
 
-    var addCourseWithName = function(courseName, alertOnError = true){
+    var addCourseWithName = function(courseName, alertOnError){
+      if (alertOnError == null) {
+        alertOnError = true;
+      }
       if (courseName.length === 0) {
         if(alertOnError) alert(COURSE_EMPTY);
         return;
@@ -209,7 +230,7 @@ $(document).ready(function() {
         cachedCourses.push(courseName);
         localStorage.courses = JSON.stringify(cachedCourses);
       }
-    }
+    };
 
     // Add cached courses if we have some
     var cachedCourses = JSON.parse(localStorage.courses || '[]');
@@ -249,7 +270,7 @@ $(document).ready(function() {
       });
       if (courseList.length === 0) return;
 
-      $('.schedule-rows').find('.time-slot').each(function(index, el) {
+      $('#schedule-rows').find('.time-slot').each(function(index, el) {
         if (el.getAttribute('data-selected') == 'selected')
           freeHours.push(intToDay[el.getAttribute('data-day')] + el.getAttribute('data-time').split(":")[
             0].replace(
@@ -285,7 +306,7 @@ $(document).ready(function() {
           possibleSchedulesEl.html(plansSize);
           conflictedHoursEl.html(conflict);
         }
-      }
+      };
 
       if (chosenSemester.length > 0) {
         processReq("findBestPlan", {
@@ -333,21 +354,44 @@ $(document).ready(function() {
       localStorage.courses = '[]';
     });
 
-    breadcrumb.on('click', '#next', function() {
-      if (loadPlan(curr + 1) !== false) {
-        $('.load-plan[data-item-id="' + curr + '"]').parent().removeClass('active');
-        curr += 1;
-        $('.load-plan[data-item-id="' + curr + '"]').parent().addClass('active');
-      }
-
-    });
-
-    breadcrumb.on('click', '#prev', function() {
+    var loadPreviousPlan = function() {
+      if (curr == null) return;
       if (loadPlan(curr - 1) !== false) {
         $('.load-plan[data-item-id="' + curr + '"]').parent().removeClass('active');
         curr -= 1;
         $('.load-plan[data-item-id="' + curr + '"]').parent().addClass('active');
       }
+    };
+
+    var loadNextPlan = function() {
+      if (curr == null) return;
+      if (loadPlan(curr + 1) !== false) {
+        $('.load-plan[data-item-id="' + curr + '"]').parent().removeClass('active');
+        curr += 1;
+        $('.load-plan[data-item-id="' + curr + '"]').parent().addClass('active');
+      }
+    };
+
+    $(document).on('keydown', function(e) {
+      if($(e.target).is('#course-insert')) return;
+
+      if (e.which === 37) {
+        // Left arrow click
+        e.stopPropagation();
+        loadPreviousPlan();
+      } else if (e.which === 39) {
+        // Right arrow click
+        e.stopPropagation();
+        loadNextPlan();
+      }
+    });
+
+    breadcrumb.on('click', '#next', function() {
+      loadNextPlan();
+    });
+
+    breadcrumb.on('click', '#prev', function() {
+      loadPreviousPlan();
     });
 
     breadcrumb.on('click', '.load-plan', function() {
@@ -369,43 +413,83 @@ $(document).ready(function() {
   //});
 
   var clearSchedule = function() {
-    var slots = $('.schedule-rows .time-slot');
+    var slots = $('#schedule-rows').find('.time-slot');
     if (slots === undefined || slots.length === 0) return;
     slots.each(function(index) {
-      $(this).html("");
-      if ($(this).hasClass("contains-course"))
-        $(this).removeClass("contains-course");
-    });
-  }
+      while (this.firstChild) {
+        this.removeChild(this.firstChild);
+      }
 
-  var putCourse = function(name, hour) {
+      $(this).removeClass("contains-course");
+    });
+
+    return slots;
+  };
+
+  var addPopover = function(el, opts) {
+    return el.popover(opts)
+             .addClass('has-popover');
+  };
+
+  var clearPopovers = function() {
+    return $(".has-popover").popover('destroy')
+                            .removeAttr('data-content data-toggle data-trigger data-original-title title')
+                            .removeClass('has-popover');
+  };
+
+  var putCourse = function(name, hour, fullName, inst) {
     var dh = /^([^0-9]*)([0-9]*)$/ig.exec(hour);
     var intD = Object.getKeyByValue(intToDay, dh[1]);
     var h = dh[2].length === 1 ? "0" + dh[2] : dh[2];
-    var slot = $(".schedule-rows").find('.time-slot[data-day="' + intD + '"][data-time="' + h + ':00"]');
-    if (!slot.hasClass("contains-course"))
+    var slot = $("#schedule-rows").find('.time-slot[data-day="' + intD + '"][data-time="' + h + ':00"]');
+    if (!slot.hasClass("contains-course")) {
       slot.addClass("contains-course");
-    slot.html(slot.html() + '<p class="text-center">' + name + '</p>');
-  }
+    }
+
+    var p = document.createElement('p');
+    p.className='text-center';
+    p.innerText = name;
+
+    slot.get(0).insertBefore(p, null);
+
+    // Show popovers on hover of time slots.
+    if (fullName != null && inst != null && window.innerWidth > 600) {
+      addPopover(slot, {
+        trigger: 'hover',
+        placement: 'auto top',
+        content: '<strong>' + fullName + '</strong> - ' + inst,
+        container: 'body',
+        html: true,
+        template: '<div class="popover"><div class="arrow"></div><div class="popover-content"></div></div>'
+      });
+    }
+  };
 
   var loadPlan = function(i) {
     if (i < 0 || i >= Object.size(plans)) return false;
-    clearSchedule();
+    $.when(clearPopovers()).done(function() {
+      $.when(clearSchedule()).done(function() {
+        var totalCredit = plans[i]
+          .map(function(course) { return parseInt(course["course-credit"]) || NaN; })
+          .reduce(function(acc, el) { return acc + el; }, 0);
+        totalCreditEl.html(totalCredit);
 
-    var totalCredit = plans[i]
-      .map(function(course) { return parseInt(course["course-credit"]) || NaN; })
-      .reduce(function(acc, el) { return acc + el; }, 0);
-    totalCreditEl.html(totalCredit);
-
-    for (var j = 0; j < Object.size(plans[i]); j++) {
-      var cName = plans[i][j]["course-name"];
-      var cHours = plans[i][j]["course-hours"];
-      var cCredit = plans[i]
-      var section = Object.keys(cHours)[0];
-      for (var hour in cHours[section])
-        if (cHours[section].hasOwnProperty(hour))
-          putCourse(cName + "." + section, cHours[section][hour]);
-    }
+        for (var j = 0; j < Object.size(plans[i]); j++) {
+          var cName = plans[i][j]["course-name"];
+          var cHours = plans[i][j]["course-hours"];
+          var cFullNames = plans[i][j]["course-full-names"];
+          var cInsts = plans[i][j]["course-insts"];
+          var section = Object.keys(cHours)[0];
+          for (var hour in cHours[section]) {
+            if (cHours[section].hasOwnProperty(hour)) {
+              var fullName = cFullNames[section][hour];
+              var inst = cInsts[section][hour];
+              putCourse(cName + "." + section, cHours[section][hour], fullName, inst);
+            }
+          }
+        }
+      });
+    });
   }
 
 });
@@ -436,10 +520,10 @@ var processReq = function(funcName, data, isAsync, fn) {
       console.log("error: ");
       console.log(xhr);
       ret = xhr;
-      if (isAsync === true) {
-        fn(xhr);
+      if (isAsync) {
+        fn(xhr.responseText);
       }
     }
   });
   return ret;
-}
+};

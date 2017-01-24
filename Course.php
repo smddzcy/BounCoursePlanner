@@ -4,12 +4,13 @@ declare(strict_types = 1);
 class Course
 {
     private $name;
+    private $fullName;
     private $hours;
     private $credit;
     private $inst;
 
     /**
-     * @return String
+     * @return mixed
      */
     public function getInst()
     {
@@ -49,6 +50,14 @@ class Course
     }
 
     /**
+     * @return mixed
+     */
+    public function getFullName()
+    {
+        return $this->fullName;
+    }
+
+    /**
      * @return array
      */
     public function getHours(): array
@@ -69,9 +78,10 @@ class Course
         $this->hours[] = $hour;
     }
 
-    public function __construct(String $name, array $hours = null, int $credit = null, String $inst = null)
+    public function __construct(String $name, array $hours = null, int $credit = null, $fullName = null, $inst = null)
     {
         $this->name = $name;
+        $this->fullName = $fullName;
         $this->hours = $hours;
         $this->credit = $credit;
         $this->inst = $inst;

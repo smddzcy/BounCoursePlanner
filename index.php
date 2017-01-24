@@ -123,6 +123,7 @@ $langClass->setUserLanguage($userLang);
                         <li><?php echo $langClass->lang['NOTE_2']; ?></li>
                         <li><?php echo $langClass->lang['NOTE_3']; ?></li>
                         <li><?php echo $langClass->lang['NOTE_4']; ?></li>
+                        <li><?php echo $langClass->lang['NOTE_5']; ?></li>
                     </ul>
                 </div>
             </div>
@@ -166,8 +167,8 @@ $langClass->setUserLanguage($userLang);
     var UNEXPECTED_ERROR = "<?php echo $langClass->lang['UNEXPECTED_ERROR']; ?>";
 </script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
-<script type="text/javascript" src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="assets/js/bootstrap-checkbox.min.js"></script>
 <script type="text/javascript" src="assets/js/social-share-kit.min.js"></script>
 <script type="text/javascript" src="assets/js/schedule.js"></script>

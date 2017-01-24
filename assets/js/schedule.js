@@ -15,10 +15,10 @@
         endTime: '19:01',
         interval: 60,
         stringDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        template: '<div class="day-schedule-selector">' +
-        '<table class="schedule-table">' +
-        '<thead class="schedule-header"></thead>' +
-        '<tbody class="schedule-rows"></tbody>' +
+        template: '<div id="day-schedule-selector">' +
+        '<table id="schedule-table" class="schedule-table">' +
+        '<thead id="schedule-header" class="schedule-header"></thead>' +
+        '<tbody id="schedule-rows" class="schedule-rows"></tbody>' +
         '</table>' +
         '<div>'
     };
@@ -37,7 +37,7 @@
         $.each(days, function (i, _) {
             html += '<th>' + (stringDays[i] || '') + '</th>';
         });
-        this.$el.find('.schedule-header').html('<tr><th></th>' + html + '</tr>');
+        this.$el.find('#schedule-header').html('<tr><th></th>' + html + '</tr>');
     };
 
     DayScheduleSelector.prototype.renderRows = function () {
@@ -45,7 +45,7 @@
             , end = this.options.endTime
             , interval = this.options.interval
             , days = this.options.days
-            , $el = this.$el.find('.schedule-rows');
+            , $el = this.$el.find('#schedule-rows');
 
         $.each(generateDates(start, end, interval), function (i, d) {
             var daysInARow = $.map(new Array(days.length), function (_, i) {

@@ -162,13 +162,17 @@ class CourseFetcher
 
                 // Code.Section, Name, Credits, Instr, Days, Hours, Classes
                 preg_match('#<td>(.*?)</td>[^<]*<td>.*?</td>[^<]*<td>([^<]*)</td>[^<]*<td>([^<]*)</td>[^<]*<td>[^<]*</td>(.*?</a>)?.*?<td>([^<]*)</td>[^<]*<td>([^<]*)</td>[^<]*<td>([^<]*)</td>[^<]*<td>(.*?)</td>#si', $section, $details);
-                $this->cleanArray($details);
+                $this->cleanArray($details, 2);
                 // No hour details, skip
                 if (preg_match('#TBA#si', $details[6])) {
                     continue;
                 }
 
-                list($courseCode, $courseSection) = explode('.', $this->trueTrim($details[1]));
+                if (array_key_exists(1, $details) && !empty($details[1])) {
+                  list($courseCode, $courseSection) = explode('.', $this->trueTrim($details[1]));
+                } else {
+                  list($courseCode, $courseSection) = ["", ""];
+                }
                 $courseName = $this->trueTrim($details[2]);
                 $courseCredit = $this->trueTrim($details[3]);
                 $courseInstr = $this->trueTrim($details[5]);
@@ -207,7 +211,15 @@ class CourseFetcher
                 }
                 // 4th index is course credit
                 if (empty($det[4])) {
-                  $det[4] = (int) $courseCredit;
+                    $det[4] = (int) $courseCredit;
+                }
+                // 5th index is full course names and instructors
+                if (empty($det[5])) {
+                    $det[5] = [];
+                }
+                $c = count(preg_split('/([A-Z][a-z]*)/', $courseDays, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY));
+                for($i = 0; $i < $c; $i++) {
+                  $det[5][] = ["fullName" => $courseName, "inst" => $courseInstr];
                 }
 
                 $this->programDetails[$lastCourseCode][$lastCourseSection] = $det;
@@ -219,7 +231,7 @@ class CourseFetcher
         return $this->programDetails;
     }
 
-    private function cleanArray(array &$arr)
+    private function cleanArray(array &$arr, $exceptKey = null)
     {
         if (!is_array($arr)) {
             return preg_replace("/\s/", '', $this->trueTrim(strip_tags($arr)));
@@ -227,8 +239,9 @@ class CourseFetcher
 
         foreach ($arr as $key => $value) {
             if (is_array($value)) {
-                $arr[$key] = $this->cleanArray($value);
+                $arr[$key] = $this->cleanArray($value, $exceptKey);
             } else {
+                if($exceptKey !== null && $key === $exceptKey) continue;
                 $arr[$key] = preg_replace("/\s/", '', $this->trueTrim(strip_tags($value)));
             }
         }
@@ -266,6 +279,15 @@ class CourseFetcher
     public function setSemester($semester)
     {
         $this->semester = $semester;
+    }
+
+    /**
+     * Clears course programs and details from memory.
+     */
+    public function clearCache()
+    {
+      $this->programs = [];
+      $this->programDetails = [];
     }
 
     private function trueTrim($str)

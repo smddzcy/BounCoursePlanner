@@ -61,7 +61,7 @@
 .border-between> [class*='col-']:first-child:before {
   display: none;
 }
-.schedule-rows td {
+#schedule-rows td {
   width: 16.67%;
   height: 50px;
   margin: 3px;
@@ -70,31 +70,31 @@
   background-color: #eee;
   cursor: pointer;
 }
-.schedule-rows .time-slot {
+#schedule-rows .time-slot {
   font-size: 12px;
   color: #fff;
 }
-.schedule-header th {
+#schedule-header th {
   text-align: center;
 }
 .time-label {
   width: 50px !important;
 }
-.schedule-rows td:first-child {
+#schedule-rows td:first-child {
   background-color: transparent;
   text-align: right;
   position: relative;
   /* top: -12px; */
 }
-.schedule-rows td.time-slot[data-selected], .schedule-rows td.time-slot[data-selecting] {
+#schedule-rows td.time-slot[data-selected], #schedule-rows td.time-slot[data-selecting] {
   /* background-color: #6a0bc1; */
   background-color: #2980b9 !important;
 }
-.schedule-rows td[data-disabled] {
+#schedule-rows td[data-disabled] {
   opacity: 0.55;
   filter: alpha(opacity=55);
 }
-.schedule-rows td.time-slot.contains-course {
+#schedule-rows td.time-slot.contains-course {
   background-color: #34495e;
   font-size: 0.9em;
   -webkit-touch-callout: none;
@@ -104,7 +104,7 @@
   -ms-user-select: none;
   user-select: none;
 }
-.schedule-rows td.time-slot.contains-course[data-selected], .schedule-rows td.time-slot.contains-course[data-selecting] {
+#schedule-rows td.time-slot.contains-course[data-selected], #schedule-rows td.time-slot.contains-course[data-selecting] {
   background: -webkit-linear-gradient(90deg, #2980b9 10%, #34495e 90%) !important;
   background: linear-gradient(0deg, #2980b9 10%, #34495e 90%) !important;
 }
@@ -404,4 +404,14 @@
 
 #panel-text {
   padding-top: 30px;
+}
+
+.popover {
+  max-width: 250px !important;
+}
+
+.popover-content {
+  padding: 6px 14px !important;
+  text-align: center !important;
+  font-size: 12px !important;
 }

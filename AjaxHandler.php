@@ -20,13 +20,14 @@ if (is_array($_POST['data']) && array_key_exists('year', $_POST['data']) && arra
 }
 
 $fetcher = new CourseFetcher($year, $semester);
-$validCourseCodes = [];
-$validCourses = []; // with sections
-foreach ($fetcher->getAllDetails() as $courseCode => $sectionArray) {
+$validCodes = [];
+$validCodesWithSections = []; // with sections
+$allCourseDetails = $fetcher->getAllDetails();
+foreach ($allCourseDetails as $courseCode => $sectionArray) {
     $sectionArray = array_keys($sectionArray);
-    $validCourseCodes[] = $courseCode;
+    $validCodes[] = $courseCode;
     for ($i = 0; $i < count($sectionArray); ++$i) {
-        $validCourses[] = $courseCode . '.' . $sectionArray[$i];
+        $validCodesWithSections[] = $courseCode . '.' . $sectionArray[$i];
     }
 }
 switch ($func) {
@@ -34,7 +35,7 @@ switch ($func) {
         echo json_encode($fetcher->getSemesters());
         break;
     case 'getAvailableCourses':
-        echo json_encode([$validCourseCodes, $validCourses]);
+        echo json_encode($allCourseDetails);
         break;
     case 'findBestPlan':
         $planner = new CoursePlanner($year, $semester);
@@ -42,7 +43,7 @@ switch ($func) {
             break;
         }
         foreach ($data['courseList'] as $courseName) {
-            if (in_array($courseName, $validCourseCodes) || in_array($courseName, $validCourses)) {
+            if (in_array($courseName, $validCodes) || in_array($courseName, $validCodesWithSections)) {
                 try {
                     $planner->addCourse($courseName);
                 } catch (Exception $e) {
@@ -75,8 +76,10 @@ switch ($func) {
                 $cName = $course->getName();
                 $cHours = $course->getHours();
                 $cCredit = $course->getCredit();
+                $cFullNames = $course->getFullName();
+                $cInsts = $course->getInst();
                 $course = ['course-name' => $cName, 'course-hours' => $cHours,
-                  'course-credit' => $cCredit];
+                  'course-credit' => $cCredit, 'course-full-names' => $cFullNames, 'course-insts' => $cInsts];
             }
         }
 
