@@ -97,7 +97,13 @@ $(document).ready(function() {
       "ü": "U",
       "ö": "O",
       "ç": "C",
-      "ı": "I"
+      "ı": "I",
+      "İ": "I",
+      "Ş": "S",
+      "Ğ": "G",
+      "Ü": "U",
+      "Ö": "O",
+      "Ç": "C"
     };
     string = string.replace(/[iışğüçö]+/g, function(letter) {
       return letters[letter];
