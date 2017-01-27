@@ -131,12 +131,12 @@ $(document).ready(function() {
       availableTagsWithSections = [];
       hoverDetails = [];
 
-      for(var courseCode in courseDetails) {
-        if(!courseDetails.hasOwnProperty(courseCode)) continue;
+      for(var courseCode in details) {
+        if(!details.hasOwnProperty(courseCode)) continue;
 
         availableTags.push(courseCode);
-        for (var section in courseDetails[courseCode]) {
-          if(!courseDetails[courseCode].hasOwnProperty(section)) continue;
+        for (var section in details[courseCode]) {
+          if(!details[courseCode].hasOwnProperty(section)) continue;
 
           availableTagsWithSections.push(courseCode + '.' + section);
         }
