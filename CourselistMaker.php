@@ -121,6 +121,8 @@ class CourselistMaker
         echo "+ Course add request is sent, your response:" . PHP_EOL;
         $responseWarnings = preg_replace("/\s+/", " ", strip_tags($responseWarnings[1]));
         echo $responseWarnings . PHP_EOL;
+
+        $this->currCourses = [];
         return $responseWarnings;
     }
 
@@ -212,7 +214,7 @@ class CourselistMaker
                 "hours" => $courseHours
             ];
         }
-        $this->displayCurrentCourses();
+        return $this->currCourses;
     }
 
     public function displayCurrentCourses()
