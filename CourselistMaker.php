@@ -4,16 +4,17 @@ require_once "CurlRequest.php";
 
 class CourselistMaker
 {
-    const COOKIE_FILE = __DIR__ . "/tmp/boun.ckk";
     const DELAY = 1; // delay between page refreshes when they can't be reached, in seconds
 
+    private $cookieFile;
     private $curlHandler;
     private $loggedIn = false;
     private $currCourses = [];
 
     public function __construct()
     {
-        $this->curlHandler = new CurlRequest(null, ["cookie" => self::COOKIE_FILE]);
+        $this->cookieFile = tempnam(__DIR__ . "/tmp/", "clmaker-ckk-");
+        $this->curlHandler = new CurlRequest(null, ["cookie" => $this->cookieFile]);
         $this->curlHandler->setExtra([
             CURLOPT_ENCODING => 'gzip, deflate',
             CURLOPT_HTTPHEADER => [
@@ -231,8 +232,6 @@ class CourselistMaker
 
     public function __destruct()
     {
-        @unlink(self::COOKIE_FILE);
+        @unlink($this->cookieFile);
     }
-
-
 }
