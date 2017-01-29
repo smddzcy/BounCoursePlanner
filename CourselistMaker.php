@@ -24,7 +24,9 @@ class CourselistMaker
                 "Connection: keep-alive",
                 "Accept-Encoding: keep-alive"
             ],
-            CURLOPT_FOLLOWLOCATION => true
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_TIMEOUT => 45,
+            CURLOPT_CONNECTTIMEOUT => 45
         ]);
     }
 
@@ -117,6 +119,8 @@ class CourselistMaker
                 echo "- Couldn't reach the course list preparation page, trying again." . PHP_EOL;
                 $this->sleep();
             }
+            echo "- Trying again to add the courses." . PHP_EOL;
+            $this->sleep();
             preg_match("#Add[^-]*Drop[^-]*Action[^-]*Warnings[^-]*Start[^>]*>(.*?)<!---#si", $addCourseResponse, $responseWarnings);
         }
         echo "+ Course add request is sent, your response:" . PHP_EOL;
