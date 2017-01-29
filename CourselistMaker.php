@@ -171,23 +171,18 @@ class CourselistMaker
             return;
         }
         $this->checkLoginStatus();
-        $this->curlHandler->setExtra([
-            CURLOPT_REFERER => "https://registration.boun.edu.tr/scripts/stuconsent.asp"
-        ]);
         while (($consentResponse = $this->curlHandler->get("https://registration.boun.edu.tr/scripts/stuconsent.asp", [
                 "action" => "add",
                 "courseabbr" => "",
                 "coursename" => "{$courseAbbr} {$courseCode}.{$section}",
                 "comment" => $msg,
                 "remLen2" => (400 - strlen($msg))
+            ], [
+                CURLOPT_REFERER => "https://registration.boun.edu.tr/scripts/stuconsent.asp"
             ])) === false) {
             echo "- Couldn't reach the consent page, trying again." . PHP_EOL;
         }
-        $this->curlHandler->setExtra([
-            CURLOPT_REFERER => null
-        ]);
         echo "+ Consent request is sent." . PHP_EOL;
-
     }
 
     public function getCurrentCourses()

@@ -112,10 +112,11 @@ class CurlRequest
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        if (!empty($this->extra)) {
+            curl_setopt_array($ch, $this->extra);
+        }
         if (!empty($extra)) {
             curl_setopt_array($ch, $extra);
-        } elseif (!empty($this->extra)) {
-            curl_setopt_array($ch, $this->extra);
         }
         $run = curl_exec($ch);
         if ($run === false) {
