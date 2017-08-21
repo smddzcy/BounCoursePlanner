@@ -120,7 +120,6 @@ class CourselistMaker
                 $this->sleep();
             }
             echo "- Trying again to add the courses." . PHP_EOL;
-            $this->sleep();
             preg_match("#Add[^-]*Drop[^-]*Action[^-]*Warnings[^-]*Start[^>]*>(.*?)<!---#si", $addCourseResponse, $responseWarnings);
         }
         echo "+ Course add request is sent, your response:" . PHP_EOL;

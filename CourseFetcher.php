@@ -45,7 +45,7 @@ class CourseFetcher
             $s = 1;
             if ($m >= 1 && $m <= 6) {
                 $s = 2;
-            } elseif ($m >= 6 && $m <= 8) {
+            } elseif ($m >= 6 && $m <= 7) {
                 $s = 3;
             }
             $this->year = date('Y');
@@ -160,8 +160,10 @@ class CourseFetcher
                     continue;
                 }
 
-                // Code.Section, Name, Credits, Instr, Days, Hours, Classes
-                preg_match('#<td>(.*?)</td>[^<]*<td>.*?</td>[^<]*<td>([^<]*)</td>[^<]*<td>([^<]*)</td>[^<]*<td>[^<]*</td>(.*?</a>)?.*?<td>([^<]*)</td>[^<]*<td>([^<]*)</td>[^<]*<td>([^<]*)</td>[^<]*<td>(.*?)</td>#si', $section, $details);
+                $c = "<td>(.*?)</td>[^<]*"; // captured col
+                $i = "<td>.*?</td>[^<]*"; // ignored col
+                // Code.Section, Name, Credits, Instr, Days, Hours, Rooms
+                preg_match("#$c$i$c$c$i$c$c$c$c#si", $section, $details);
                 $this->cleanArray($details, 2);
                 // No hour details, skip
                 if (preg_match('#TBA#si', $details[6])) {
@@ -175,18 +177,14 @@ class CourseFetcher
                 }
                 $courseName = $this->trueTrim($details[2]);
                 $courseCredit = $this->trueTrim($details[3]);
-                $courseInstr = $this->trueTrim($details[5]);
-                $courseDays = $this->trueTrim($details[6]);
-                $courseHours = $this->trueTrim($details[7]);
-                $courseRooms = $this->trueTrim($details[8]);
+                $courseInstr = $this->trueTrim($details[4]);
+                $courseDays = $this->trueTrim($details[5]);
+                $courseHours = $this->trueTrim($details[6]);
+                $courseRooms = $this->trueTrim($details[7]);
 
                 // If course code is empty, then it belongs to a parent course.
                 $det = null;
                 if (empty($courseCode)) {
-                    // Details' indices increase by 1 if courseCode is empty.
-                    $courseInstr = $this->trueTrim($details[6]);
-                    $courseDays = $this->trueTrim($details[7]);
-                    $courseHours = $this->trueTrim($details[8]);
                     // Get the main course field, it's a LAB or P.S.
                     $det = $this->programDetails[$lastCourseCode][$lastCourseSection];
                 } else {

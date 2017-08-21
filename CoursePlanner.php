@@ -93,7 +93,7 @@ class CoursePlanner
               // 0 days 1 hours
               $courseDays = preg_split('/([A-Z][a-z]*)/', $details[0], -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
               if (empty($courseDays)) {
-                  throw new Exception($name.' has no schedule details or corrupt details.');
+                  throw new Exception($name.' has no schedule details.');
               }
               $courseHours = [];
               if (strlen(preg_replace('![^A-Z]+!', null, $details[0])) == strlen($details[1])) {
