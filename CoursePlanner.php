@@ -27,9 +27,9 @@ class CoursePlanner
         } else {
             $m = (int) date('m');
             $s = 1;
-            if ($m >= 1 && $m <= 6) {
+            if ($m >= 1 && $m <= 5) {
                 $s = 2;
-            } elseif ($m >= 6 && $m <= 8) {
+            } elseif ($m >= 6 && $m <= 7) {
                 $s = 3;
             }
 

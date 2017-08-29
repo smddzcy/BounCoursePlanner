@@ -43,7 +43,7 @@ class CourseFetcher
         } else {
             $m = (int) date('m');
             $s = 1;
-            if ($m >= 1 && $m <= 6) {
+            if ($m >= 1 && $m <= 5) {
                 $s = 2;
             } elseif ($m >= 6 && $m <= 7) {
                 $s = 3;
@@ -129,9 +129,9 @@ class CourseFetcher
      *
      * @return mixed [Section] [Days][Hours][Rooms][Instructor]
      */
-    public function getDetails(String $abbr, int $code = null)
+    public function getDetails(String $abbr, int $code = null, $includePs = false)
     {
-        $this->getAllDetails();
+        $this->getAllDetails(false, $includePs);
         if (!array_key_exists($abbr.$code, $this->programDetails)) {
             return false;
         }
@@ -142,8 +142,9 @@ class CourseFetcher
         return $this->programDetails[$abbr.$code];
     }
 
-    public function getAllDetails($update = false)
+    public function getAllDetails($update = false, $includePs = false)
     {
+        // TODO(smddzcy): Include PS hours depending on $includePs.
         $detailsFilename = sprintf(self::FILENAME_DETAILS, $this->year, $this->semester);
 
         if ($update !== true && file_exists($detailsFilename)) {
@@ -215,8 +216,8 @@ class CourseFetcher
                 if (empty($det[5])) {
                     $det[5] = [];
                 }
-                $c = count(preg_split('/([A-Z][a-z]*)/', $courseDays, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY));
-                for($i = 0; $i < $c; $i++) {
+                $count = count(preg_split('/([A-Z][a-z]*)/', $courseDays, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY));
+                for($i = 0; $i < $count; $i++) {
                   $det[5][] = ["fullName" => $courseName, "inst" => $courseInstr];
                 }
 
