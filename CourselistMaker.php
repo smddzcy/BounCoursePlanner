@@ -122,7 +122,7 @@ class CourselistMaker
             echo "- Trying again to add the courses." . PHP_EOL;
             preg_match("#Add[^-]*Drop[^-]*Action[^-]*Warnings[^-]*Start[^>]*>(.*?)<!---#si", $addCourseResponse, $responseWarnings);
         }
-        echo "+ Course add request is sent, your response:" . PHP_EOL;
+        echo "+ Course add request is sent, response:" . PHP_EOL;
         $responseWarnings = preg_replace("/\s+/", " ", strip_tags($responseWarnings[1]));
         echo $responseWarnings . PHP_EOL;
 
@@ -152,7 +152,7 @@ class CourselistMaker
 
         $postData = [
             "B1" => "Change",
-            "R1" => "{$courseAbbr}  {$courseCode}.{$newSection}"
+            "R1" => "{$courseAbbr} {$courseCode}.{$newSection}"
         ];
 
         while (($changeSectionResponse = $this->curlHandler->get("https://registration.boun.edu.tr/scripts/secchaact.asp", $postData, [
@@ -161,12 +161,16 @@ class CourselistMaker
             echo "- Couldn't make the section change request, trying again." . PHP_EOL;
             $this->sleep();
         }
-        preg_match("#<FONT[^>]*>(.*?)</FONT>#si", $changeSectionResponse, $responseWarnings);
+        preg_match("#<font[^>]*>(.*?)</font>#si", $changeSectionResponse, $responseWarnings);
 
-        echo "+ Change section request is sent for {$courseAbbr} {$courseCode}.{$newSection}, your response:" . PHP_EOL;
-        $responseWarnings = preg_replace("/\s+/", " ", strip_tags($responseWarnings[1]));
-        echo $responseWarnings . PHP_EOL;
-        return $responseWarnings;
+        if (empty($responseWarnings[1])) {
+            echo "+ Section is changed.";
+            return true;
+        }
+
+        echo "+ Section change request is sent for {$courseAbbr} {$courseCode}.{$newSection}, response:" . PHP_EOL;
+        echo preg_replace("/\s+/", " ", strip_tags($responseWarnings[1])) . PHP_EOL;
+        return false;
     }
 
     public function sendConsent($courseAbbr, $courseCode, $section, $msg)

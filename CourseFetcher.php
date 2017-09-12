@@ -167,7 +167,7 @@ class CourseFetcher
                 preg_match("#$c$i$c$c$i$c$c$c$c#si", $section, $details);
                 $this->cleanArray($details, 2);
                 // No hour details, skip
-                if (preg_match('#TBA#si', $details[6])) {
+                if (preg_match('#TBA#si', $details[5])) {
                     continue;
                 }
 
