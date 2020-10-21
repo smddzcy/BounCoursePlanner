@@ -18,7 +18,7 @@ if (php_sapi_name() == "cli") {
 
     if (!array_key_exists(1, $argv)) {
         echo "Usage: php " . pathinfo(__FILE__, PATHINFO_BASENAME) . " [Room] [Day] [Hour]" . PHP_EOL;
-        echo " [Room] \tFull room code or part of it. (NH,NH1,NH101 etc.)" . PHP_EOL;
+        echo " [Room] \tRoom code or part of it. (NH, NH1, NH101 etc.)" . PHP_EOL;
         echo " [Day]\t\tOptional. Filters free rooms by day. Abbreviations are ok. (T,Tue,W,Wednesday etc.) " . PHP_EOL;
         echo " [Hour]\t\tOptional. Filters free rooms by hour. UTC+2 (Turkey timezone) hour, not lecture hours! (9,10,15 etc.) " . PHP_EOL;
         die();
